@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex">
+  <div class="sidebar me-4">
+    <h6 class="mb-3 text-primary fw-bold">VĂN BẢN ĐI</h6>
+    <a href="{% url 'lap_du_thao' %}">Lập dự thảo</a>
+    <a href="{% url 'van_ban_cho_ban_hanh' %}" class="fw-bold text-primary">Văn bản đi chờ ban hành</a>
+    <a href="{% url 'van_ban_di_ca_nhan' %}">Văn bản đi cá nhân</a>
+    <a href="{% url 'tra_cuu_van_ban_di' %}" >Tra cứu văn bản đi</a>
+  </div>
+
+  <div class="flex-grow-1">
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <h4 class="fw-bold mb-4 mt-2">Văn bản đi chờ ban hành</h4>
+
+    <form method="GET" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Từ khóa tìm kiếm:</label>
+          <input type="text" class="form-control" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Nhập trích yếu, số ký hiệu">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Từ ngày:</label>
+          <input type="date" class="form-control" name="tu_ngay" value="{{ request.GET.tu_ngay|default:'' }}">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Đến ngày:</label>
+          <input type="date" class="form-control" name="den_ngay" value="{{ request.GET.den_ngay|default:'' }}">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Hạn xử lý:</label>
+            <select class="form-select" name="han_xu_ly">
+                <option value="all" {% if request.GET.han_xu_ly == 'all' %}selected{% endif %}>Tất cả</option>
+                <option value="hom_nay" {% if request.GET.han_xu_ly == 'hom_nay' %}selected{% endif %}>Hôm nay</option>
+                <option value="qua_han" {% if request.GET.han_xu_ly == 'qua_han' %}selected{% endif %}>Quá hạn</option>
+                <option value="sap_den_han" {% if request.GET.han_xu_ly == 'sap_den_han' %}selected{% endif %}>Sắp đến hạn</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-50 me-2">Tìm kiếm</button>
+          <a href="{% url 'van_ban_cho_ban_hanh' %}" class="btn btn-secondary w-50">Clear</a>
+        </div>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-primary">
+          <tr>
+            <th>STT</th>
+            <th>Người lập</th>
+            <th>Người duyệt</th>
+            <th>Ngày tạo</th>
+            <th>Trích yếu</th>
+            <th>Hạn xử lý</th>
+            <th>File</th>
+            <th style="width: 120px;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vb in van_ban_list %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ vb.nguoi_lap.username }}</td>
+
+            <td class="text-primary">
+                {% if vb.nguoi_duyet %}
+                    {{ vb.nguoi_duyet.get_full_name|default:vb.nguoi_duyet.username }}
+                {% else %}
+                    <span class="text-muted fst-italic">Chưa chọn</span>
+                {% endif %}
+            </td>
+
+            <td>{{ vb.ngay_tao|date:"d/m/Y" }}</td>
+            <td class="text-start">{{ vb.trich_yeu|default:"(Chưa nhập)" }}</td>
+            <td>{{ vb.han_xu_ly|date:"d/m/Y"|default:"-" }}</td>
+
+            <td>
+              {% if vb.file_du_thao %}
+                <a href="{{ vb.file_du_thao.url }}" target="_blank" class="text-decoration-none">Xem file</a>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if request.user == vb.nguoi_duyet or request.user.is_superuser %}
+                  <div class="d-flex flex-column gap-1">
+                      <a href="{% url 'duyet_van_ban' vb.id %}"
+                         class="text-decoration-none"
+                         onclick="return confirm('Xác nhận duyệt?');">
+                         Duyệt
+                      </a>
+                      <a href="{% url 'yeu_cau_sua_vbdi' vb.id %}"
+                         class="text-decoration-none"
+                         onclick="return confirm('Yêu cầu sửa?');">
+                         Yêu cầu sửa
+                      </a>
+                  </div>
+              {% else %}
+                  <span class="text-muted small">Chờ duyệt</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8" class="text-muted">Không có văn bản nào.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<p>{% translate "Bạn đã đăng xuất khỏi hệ thống. Vui lòng đóng trình duyệt để đảm bảo an toàn thông tin." %}</p>
+
+<p><a href="{% url 'accounts:login' %}">{% translate 'Log in again' %}</a></p>
+
+{% endblock %}

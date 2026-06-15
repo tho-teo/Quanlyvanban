@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Theo dõi xử lý{% endblock %}
+
+{% block content %}
+<div class="row">
+ <!-- SIDEBAR -->
+ <div class="col-md-2 sidebar">
+   <h6 class="text-uppercase mb-3">Văn bản đến</h6>
+   <a href="{% url 'vanban_cho_xuly' %}">Văn bản chờ xử lý</a>
+   <a href="{% url 'theodoi_xuly' %}" class="fw-bold text-primary">Theo dõi xử lý</a>
+   <a href="{% url 'tracuu_vanbanden' %}">Tra cứu văn bản đến</a>
+ </div>
+
+ <!-- NỘI DUNG -->
+  <div class="flex-grow-1">
+    <h4 class="fw-bold mb-4 mt-2">Theo dõi xử lý</h4>
+
+     {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="get" class="row g-3 mb-4 align-items-end">
+        <div class="col-md-3">
+          {{ form.TieuDe.label_tag }}
+          {{ form.TieuDe }}
+        </div>
+        <div class="col-md-2">
+          {{ form.TrangThai.label_tag }}
+          {{ form.TrangThai }}
+        </div>
+        <div class="col-md-2">
+          {{ form.TuNgay.label_tag }}
+          {{ form.TuNgay }}
+        </div>
+        <div class="col-md-2">
+          {{ form.DenNgay.label_tag }}
+          {{ form.DenNgay }}
+        </div>
+
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-50">Tìm kiếm</button>
+            <a href="{% url 'theodoi_xuly' %}" class="btn btn-secondary w-50">Clear</a>
+        </div>
+      </form>
+
+    <div class="table-responsive">
+     <table class="table table-bordered align-middle text-center">
+       <thead class="table-primary">
+         <tr>
+          <th style="width:5%;">STT</th>
+          <th style="width:5%;">Số/Ký hiệu</th>
+          <th style="width:25%;">Trích yếu</th>
+          <th style="width:20%;">Công việc</th>
+          <th style="width:10%;">Người xử lý</th>
+          <th style="width:5%;">Hạn xử lý</th>
+          <th style="width:5%;">Trạng thái</th>
+        </tr>
+      </thead>
+
+  <tbody>
+    {% if cong_viecs %}
+      {% for cv in cong_viecs %}
+      <tr>
+        <td class="text-center">{{ forloop.counter }}</td>
+        <td>{{ cv.MaVanBanDen.SoKyHieu }}</td>
+        <td class="text-start">{{ cv.MaVanBanDen.TrichYeu }}</td>
+        <td class="text-start">{{ cv.TieuDe }}</td>
+
+        <td>
+          {% if cv.NguoiXuLyChinh %}
+            {% with full=cv.NguoiXuLyChinh.get_full_name %}
+              {% if full %}
+                {{ full }}
+              {% else %}
+                {{ cv.NguoiXuLyChinh.username }}
+              {% endif %}
+            {% endwith %}
+          {% else %}
+            <span class="text-muted">Chưa phân công</span>
+          {% endif %}
+        </td>
+
+        <td>{{ cv.HanXuLy|date:"d/m/Y" }}</td>
+
+        <td class="text-center">
+            {% if cv.TrangThai == "Đang xử lý" %}
+                <span class="text-primary fw-semibold">Đang xử lý</span>
+
+            {% elif cv.TrangThai == "Chờ phê duyệt" %}
+                <a href="{% url 'duyet_cong_viec' cv.MaCV %}" class="text-primary fw-semibold">Xem & Duyệt</a>
+
+            {% elif cv.TrangThai == "Chờ xử lý" %}
+                <span class="text-primary fw-semibold d-block mb-1">
+                  {{ cv.TrangThai }}
+                </span>
+
+                {% if cv.MaVanBanDen %}
+                    <a href="{% url 'phan_cong_lai' cv.MaVanBanDen.pk cv.pk %}" class="btn btn-warning btn-sm mt-1">
+                        Phân công lại
+                    </a>
+                {% else %}
+                    <button class="btn btn-warning btn-sm mt-1" disabled>Phân công lại</button>
+                {% endif %}
+
+            {% else %}
+                <span class="text-muted">{{ cv.TrangThai }}</span>
+            {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr>
+        <td colspan="7" class="text-center text-muted">Không có công việc nào.</td>
+      </tr>
+    {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

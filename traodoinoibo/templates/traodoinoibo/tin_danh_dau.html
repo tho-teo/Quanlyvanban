@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Tin đánh dấu{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <!-- SIDEBAR -->
+    <div class="col-md-2 sidebar shadow-sm p-3">
+      <h6 class="fw-bold text-dark mb-3" style="font-size: 16px;">TRAO ĐỔI NỘI BỘ</h6>
+      <a href="{% url 'soantin' %}" class="sidebar-link">Soạn tin</a>
+<!--      <a href="{% url 'tinden' %}" class="sidebar-link">Tin đến</a>-->
+<!--      <a href="{% url 'tindagui' %}" class="sidebar-link">Tin đã gửi</a>-->
+<!--      <a href="{% url 'tindanhdau' %}" class="sidebar-link active">Tin đánh dấu</a>-->
+<!--      <a href="{% url 'tinnhap' %}" class="sidebar-link active">Tin nháp</a>-->
+<!--      <a href="{% url 'tindaxoa' %}" class="sidebar-link active">Tin đã xóa</a>-->
+    </div>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <div class="col-md-10 p-2">
+      <h4 class="fw-bold text-primary mb-4">Tin đánh dấu</h4>
+
+      <!-- THANH CÔNG CỤ -->
+      <form method="get" class="d-flex align-items-center flex-wrap gap-3 mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <label for="tu_ngay" class="form-label mb-0" style="white-space: nowrap;">Từ ngày</label>
+          <input type="date" id="tu_ngay" name="tu_ngay" value="{{ tu_ngay }}" class="form-control form-control-sm" style="min-width: 160px;">
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <label for="den_ngay" class="form-label mb-0" style="white-space: nowrap;">Đến ngày</label>
+          <input type="date" id="den_ngay" name="den_ngay" value="{{ den_ngay }}" class="form-control form-control-sm" style="min-width: 160px;">
+        </div>
+
+        <div class="input-group w-auto">
+          <input type="text" name="q" value="{{ keyword }}" class="form-control form-control-sm" placeholder="Nhập tiêu đề hoặc người nhận">
+          <button class="btn btn-outline-secondary btn-sm" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- BẢNG -->
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center mb-0">
+              <thead style="background-color: #007bff; color: #fff;">
+                <tr>
+                  <th style="width:20%;">Người gửi</th>
+                  <th style="width:20%;">Người nhận</th>
+                  <th style="width:20%;">Đơn vị trực thuộc</th>
+                  <th style="width:30%;">Tiêu đề</th>
+                  <th style="width:10%;">Thời gian</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if danh_sach_tin %}
+                  {% for tin in danh_sach_tin %}
+                    <tr>
+                      <td class="text-start">
+                        {% if tin.NguoiGui.get_full_name %}
+                          {{ tin.NguoiGui.get_full_name }}
+                        {% else %}
+                          {{ tin.NguoiGui.user.username }}
+                        {% endif %}
+                      </td>
+                      <td class="text-start">
+                        {% if tin.NguoiNhan.get_full_name %}
+                          {{ tin.NguoiNhan.get_full_name }}
+                        {% else %}
+                          {{ tin.NguoiNhan.user.username }}
+                        {% endif %}
+                      </td>
+                      <td>{{ tin.NguoiGui.DonViTrucThuoc|default:"-" }}</td>
+                      <td class="text-start">
+                        <a href="{% url 'traodoi_detail' tin.MaTin %}" class="text-decoration-none text-dark">
+                          {{ tin.TieuDe }}
+                        </a>
+                      </td>
+                      <td>
+                        {% if tin.ThoiGianGui %}
+                          {{ tin.ThoiGianGui|date:"H:i d/m/Y" }}
+                        {% else %}
+                          <span class="text-muted">-</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="5" class="py-3 fw-semibold text-muted">KHÔNG CÓ DỮ LIỆU</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

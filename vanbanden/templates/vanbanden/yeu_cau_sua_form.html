@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Yêu cầu xử lý lại{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- SIDEBAR -->
+     <div class="col-md-2 sidebar">
+       <h6 class="text-uppercase mb-3">Văn bản đến</h6>
+       <a href="{% url 'vanban_cho_xuly' %}">Văn bản chờ xử lý</a>
+       <a href="{% url 'theodoi_xuly' %}"class="fw-bold text-primary">Theo dõi xử lý</a>
+       <a href="{% url 'tracuu_vanbanden' %}">Tra cứu văn bản đến</a>
+     </div>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <div class="col-md-10">
+        <div class="container mt-4">
+            <h4 class="fw-bold text-dark mb-4">
+                Yêu cầu xử lý lại: <em>{{ cong_viec.TieuDe }}</em>
+            </h4>
+
+            <!-- HIỂN THỊ THÔNG BÁO -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- FORM -->
+            <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm mt-3">
+                {% csrf_token %}
+
+                <!-- Thông tin văn bản -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-custom-header text-dark fw-bold">
+                        Văn bản liên quan
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1"><b>Trích yếu:</b> <span class="fw-semibold">{{ van_ban.TrichYeu }}</span></p>
+                        {% if van_ban.SoDen %}
+                            <p class="mb-1"><b>Số đến:</b> <span class="fw-semibold">{{ van_ban.SoDen }}</span>
+                            {% if van_ban.NgayDen %}
+                                – <b>Ngày đến:</b> <span class="fw-semibold">{{ van_ban.NgayDen|date:"d/m/Y" }}</span>
+                            {% endif %}
+                            </p>
+                        {% endif %}
+                        {% if van_ban.SoKyHieu %}
+                            <p class="mb-1"><b>Số ký hiệu:</b> <span class="fw-semibold">{{ van_ban.SoKyHieu }}</span></p>
+                        {% endif %}
+                        {% if van_ban.CoQuanBanHanh %}
+                            <p class="mb-1"><b>Cơ quan ban hành:</b> <span class="fw-semibold">{{ van_ban.CoQuanBanHanh }}</span></p>
+                        {% endif %}
+                        {% if van_ban.FileDinhKem %}
+                            <a href="{{ van_ban.FileDinhKem.url }}" target="_blank" class="btn btn-outline-primary btn-sm mt-3">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Tải/Xem file đính kèm
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Nhập yêu cầu xử lý lại -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tiêu đề yêu cầu:</label>
+                    {{ form.TieuDe }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nội dung cần xử lý lại:</label>
+                    {{ form.NoiDung }}
+                </div>
+
+                {% if form.FileDinhKem %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tệp đính kèm (nếu có):</label>
+                    {{ form.FileDinhKem }}
+                </div>
+                {% endif %}
+
+                <!-- Nút hành động -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'theodoi_xuly' %}" class="btn btn-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary">Gửi yêu cầu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

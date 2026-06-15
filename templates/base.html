@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Hệ thống quản lý văn bản{% endblock %}</title>
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body { background: #f8f9fa; padding-top: 56px; }
+    .navbar { background-color: #0b3d91; }
+    .navbar .nav-link, .navbar-brand { color: white !important; }
+
+    :root {
+      --soft-blue: #e7f2fa;
+      --soft-blue-border: #bcd7e8;
+    }
+
+    table thead th { background-color: var(--soft-blue) !important; color: #000 !important; border-bottom: 1px solid var(--soft-blue-border) !important; }
+    table tbody td, table thead th { border-color: var(--soft-blue-border) !important; }
+    .card-header { background-color: var(--soft-blue) !important; color: #000 !important; border-bottom: 1px solid var(--soft-blue-border) !important; }
+
+    .table td, .table th { white-space: nowrap; }
+    .table .text-start { white-space: normal; }
+
+    .sidebar { background: #f1f3f5; width: 220px; min-height: 100vh; position: fixed; top: 56px; left: 0; padding: 20px; overflow: auto; }
+    .sidebar a { color: #0b3d91; text-decoration: none; display: block; padding: 6px 0; }
+    .sidebar a:hover { text-decoration: underline; }
+
+    .content { margin-left: 240px; padding: 30px; }
+    form.row.g-3 input, form.row.g-3 select, form.row.g-3 .input-group { height: 40px; min-height: 40px; }
+
+    footer { text-align: center; color: #6c757d; margin-top: 40px; }
+
+    .notification-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+
+{% load static %}
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+      <img src="{% static 'images/logo.due.png' %}" height="40" class="me-2" alt="Logo DUE">
+      DUE
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="/">TRANG CHỦ</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'lap_du_thao' %}">VĂN BẢN ĐI</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'vanban_cho_xuly' %}">VĂN BẢN ĐẾN</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'cong_viec_cho_xu_ly' %}">CÔNG VIỆC</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'soan_tin' %}">TRAO ĐỔI NỘI BỘ</a></li>
+      </ul>
+
+      <div class="d-flex align-items-center position-relative">
+        {% if user.is_authenticated %}
+        <!-- Dropdown thông báo -->
+        <div class="dropdown me-3">
+          <a class="text-white position-relative" href="#" role="button" id="dropdownNotification" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell-fill fs-5"></i>
+            {% if unread_count > 0 %}
+              <span class="badge bg-danger notification-badge">{{ unread_count }}</span>
+            {% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownNotification" style="width: 300px;">
+            <li class="px-2 py-1">
+              <a href="{% url 'mark_all_as_read' %}" class="btn btn-sm btn-primary w-100">Đánh dấu tất cả đã đọc</a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            {% if notifications %}
+              {% for noti in notifications|slice:":5" %}
+                <li>
+                  <div class="dropdown-item {% if noti.is_read == False %}fw-bold{% endif %}">
+                    <div>{{ noti.title }}</div>
+                    <small class="text-muted">{{ noti.created_at|date:"d/m/Y H:i" }}</small>
+                  </div>
+                </li>
+                {% if not forloop.last %}<li><hr class="dropdown-divider"></li>{% endif %}
+              {% endfor %}
+              <li><a class="dropdown-item text-center" href="{% url 'thong_bao_list' %}">Xem tất cả</a></li>
+            {% else %}
+              <li><span class="dropdown-item text-center">Không có thông báo</span></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <a href="{% url 'profile' %}" class="text-white me-3 fw-bold text-decoration-none">
+          <i class="bi bi-person-circle me-1"></i> {{ user.first_name }} {{ user.last_name }}
+        </a>
+        <a href="/accounts/logout/" class="text-white">
+          <i class="bi bi-box-arrow-right fs-5"></i>
+        </a>
+        {% else %}
+        <a href="/accounts/login/" class="text-white me-2">
+          <i class="bi bi-person-circle fs-5"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="content">
+  {% block content %}{% endblock %}
+  <footer>
+    <p>© 2025 Trường Đại học Kinh tế - Đại học Đà Nẵng</p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Văn bản chờ xử lý{% endblock %}
+
+{% block content %}
+<div class="row">
+ <!-- SIDEBAR -->
+ <div class="col-md-2 sidebar">
+   <h6 class="text-uppercase mb-3">Văn bản đến</h6>
+   <a href="{% url 'vanban_cho_xuly' %}"class="fw-bold text-primary">Văn bản chờ xử lý</a>
+   <a href="{% url 'theodoi_xuly' %}">Theo dõi xử lý</a>
+   <a href="{% url 'tracuu_vanbanden' %}">Tra cứu văn bản đến</a>
+ </div>
+ <!-- NỘI DUNG -->
+  <div class="flex-grow-1">
+    <h4 class="fw-bold mb-4 mt-2">Văn bản chờ xử lý</h4>
+    <!-- FORM LỌC -->
+      <form method="get" class="row g-3 mb-4 align-items-end">
+        <div class="col-md-3">{{ form.q.label_tag }} {{ form.q }}</div>
+        <div class="col-md-2">{{ form.tu_ngay.label_tag }} {{ form.tu_ngay }}</div>
+        <div class="col-md-2">{{ form.den_ngay.label_tag }} {{ form.den_ngay }}</div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-50">Tìm kiếm</button>
+            <a href="{% url 'vanban_cho_xuly' %}" class="btn btn-secondary w-50">Clear</a>
+        </div>
+      </form>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-primary">
+          <tr>
+           <th style="width:5%;">STT</th>
+           <th style="width:10%;">Số đến</th>
+           <th style="width:15%;">Ngày đến</th>
+           <th style="width:20%;">Số/Ký hiệu</th>
+           <th style="width:30%;">Trích yếu</th>
+           <th style="width:15%;">Cơ quan ban hành</th>
+         </tr>
+       </thead>
+       <tbody>
+         {% for vb in vanbans %}
+         <tr>
+           <td>{{ forloop.counter }}</td>
+            <td>{{ vb.SoDen }}</td>
+            <td>{{ vb.NgayDen }}</td>
+            <td>{{ vb.SoKyHieu }}</td>
+            <td>
+              <a href="{% url 'vanban_detail' vb.MaVanBanDen %}" class="text-primary text-decoration-none">
+                {{ vb.TrichYeu }}
+              </a>
+            </td>
+            <td>{{ vb.CoQuanBanHanh }}</td>
+         </tr>
+         {% empty %}
+         <tr>
+           <td colspan="7" class="text-muted">Không có văn bản nào.</td>
+         </tr>
+         {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

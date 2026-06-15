@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Công việc đã hoàn thành{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-md-2 sidebar">
+        <h6 class="text-uppercase mb-3">Công việc</h6>
+        <a href="{% url 'cong_viec_cho_xu_ly' %}">Công việc chờ xử lý</a>
+        <a href="{% url 'cong_viec_dang_xu_ly' %}">Công việc đang xử lý</a>
+        <a href="{% url 'cong_viec_da_hoan_thanh' %}" class="fw-bold text-primary">Công việc đã hoàn thành</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-grow-1">
+        <h5 class="fw-bold text-dark mb-4">Công việc đã hoàn thành</h5>
+
+        <!-- FORM LỌC -->
+        <form method="get" class="row g-3 mb-4 align-items-end">
+            <div class="col-md-3">
+                {{ form.TuNgay.label_tag }}
+                {{ form.TuNgay }}
+            </div>
+            <div class="col-md-3">
+                {{ form.DenNgay.label_tag }}
+                {{ form.DenNgay }}
+            </div>
+            <div class="col-md-3">
+                {{ form.TieuDe.label_tag }}
+                {{ form.TieuDe }}
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-50">Tìm kiếm</button>
+                <a href="{% url 'cong_viec_da_hoan_thanh' %}" class="btn btn-secondary w-50">Clear</a>
+            </div>
+        </form>
+
+        <!-- BẢNG DỮ LIỆU -->
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th style="width:5%;">STT</th>
+                        <th style="width:30%;">Tiêu đề</th>
+                        <th style="width:15%;">Người phụ trách</th>
+                        <th style="width:15%;">Người phối hợp</th>
+                        <th style="width:10%;">Hạn xử lý</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cv in cong_viec_da_hoan_thanh %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+
+                        <!-- TIÊU ĐỀ -->
+                        <td class="text-start">
+                            <a href="{% url 'cong_viec_da_hoan_thanh_detail' cv.MaCV %}"
+                               class="text-decoration-none text-primary fw-semibold">
+                                {{ cv.TieuDe }}
+                            </a>
+                        </td>
+
+                        <!-- NGƯỜI PHỤ TRÁCH -->
+                        <td>{{ cv.NguoiXuLyChinh.get_full_name }}</td>
+
+                        <!-- NGƯỜI PHỐI HỢP -->
+                        <td>
+                            {% if cv.nguoi_phoi_hop_list %}
+                                {% for np in cv.nguoi_phoi_hop_list %}
+                                    {{ np.NguoiDung.get_full_name }}{% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- HẠN XỬ LÝ -->
+                        <td>{{ cv.HanXuLy|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            Chưa có công việc nào hoàn thành
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Tin đã xóa{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <!-- SIDEBAR -->
+   <div class="col-md-2 sidebar">
+        <h6 class="text-uppercase mb-3">Trao đổi nội bộ</h6>
+
+        <a href="{% url 'soan_tin' %}">Soạn tin</a>
+        <a href="{% url 'tin_den' %}">Tin đến</a>
+        <a href="{% url 'tin_da_gui' %}">Tin đã gửi</a>
+        <a href="{% url 'tin_nhap' %}">Tin nháp</a>
+        <a href="{% url 'tin_da_xoa' %}" class="fw-bold text-primary">Tin đã xóa</a>
+    </div>
+
+    <!-- MAIN -->
+ <div class="flex-grow-1">
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+        <h5 class="fw-bold text-dark mb-4">Tin đã xóa</h5>
+
+        <!-- FORM FILTER (GET) -->
+        <form method="get" class="row g-3 align-items-end mb-3">
+
+            <div class="col-md-3">
+                {{ form.TuNgay.label_tag }}
+                {{ form.TuNgay }}
+            </div>
+
+            <div class="col-md-3">
+                {{ form.DenNgay.label_tag }}
+                {{ form.DenNgay }}
+            </div>
+
+            <div class="col-md-3">
+                {{ form.TieuDe.label_tag }}
+                {{ form.TieuDe }}
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+                <button class="btn btn-primary w-50" type="submit">Tìm kiếm</button>
+                <a href="{% url 'tin_da_xoa' %}" class="btn btn-secondary w-50">Clear</a>
+            </div>
+
+        </form>
+
+        <!-- FORM ACTION (POST) -->
+        <form method="post" action="{% url 'action_tin_xoa' %}">
+            {% csrf_token %}
+
+            <div class="mb-2 d-flex gap-2">
+                <button name="btn_restore" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-counterclockwise"></i> Khôi phục
+                </button>
+
+                <button name="btn_delete" class="btn btn-outline-danger btn-sm"
+                        onclick="return confirm('Xóa vĩnh viễn? Không thể khôi phục!')">
+                    <i class="bi bi-trash"></i> Xóa vĩnh viễn
+                </button>
+            </div>
+
+            <div>
+                <div class="card-body p-0">
+
+                    <table class="table table-bordered text-center align-middle mb-0">
+                        <thead class="table-primary">
+                        <tr>
+                            <th style="width:40px"><input type="checkbox" id="select-all"></th>
+                            <th>Người gửi</th>
+                            <th>Người nhận</th>
+                            <th>Đơn vị trực thuộc</th>
+                            <th>Tiêu đề</th>
+                            <th>Thời gian</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% if danh_sach_tin %}
+                            {% for tin in danh_sach_tin %}
+                            <tr>
+                                <td><input type="checkbox" name="ids" value="{{ tin.MaTin }}"></td>
+
+                                <td class="text-start">
+                                    {{ tin.NguoiGui.get_full_name|default:tin.NguoiGui.username }}
+                                </td>
+
+                                <!-- Người nhận -->
+                                <td class="text-start">
+                                    {% if tin.NguoiNhan.all %}
+                                        {% for u in tin.NguoiNhan.all %}
+                                            {{ u.get_full_name|default:u.username }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                <!-- Đơn vị trực thuộc -->
+                                <td>
+                                    {% if tin.NguoiGui.userprofile.phong_ban %}
+                                        {{ tin.NguoiGui.userprofile.phong_ban.TenPB }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+
+                                <td class="text-start">
+                                <a href="{% url 'tin_detail_tin_da_xoa' tin.MaTin %}" class="text-decoration-none text-primary">
+                                    {{ tin.TieuDe }}
+                                </a>
+                            </td>
+
+                                <td>{{ tin.ThoiGianGui|date:"H:i d/m/Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+    <td colspan="6" class="text-center text-muted">
+        Không có tin đã xóa
+    </td>
+</tr>
+
+                        {% endif %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+document.getElementById("select-all").addEventListener("change", function () {
+    document.querySelectorAll("input[name='ids']").forEach(cb => cb.checked = this.checked);
+});
+</script>
+
+{% endblock %}

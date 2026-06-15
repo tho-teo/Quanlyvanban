@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết tin nháp{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- SIDEBAR TRÁI -->
+    <div class="col-md-2 sidebar">
+        <h6 class="text-uppercase mb-3">Trao đổi nội bộ</h6>
+        <a href="{% url 'soan_tin' %}">Soạn tin</a>
+        <a href="{% url 'tin_den' %}">Tin đến</a>
+        <a href="{% url 'tin_da_gui' %}">Tin đã gửi</a>
+        <a href="{% url 'tin_nhap' %}" class="fw-bold text-primary">Tin nháp</a>
+        <a href="{% url 'tin_da_xoa' %}">Tin đã xóa</a>
+    </div>
+
+    <!-- NỘI DUNG CHI TIẾT -->
+    <div class="col-md-10">
+        {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{{ tin.TieuDe }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Người gửi:</strong> {{ tin.NguoiGui.get_full_name|default:tin.NguoiGui.username }}</p>
+
+                <p><strong>Người nhận:</strong>
+                    {% for u in tin.NguoiNhan.all %}
+                        {{ u.get_full_name|default:u.username }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+
+                <p><strong>Đơn vị:</strong>
+                {% for nhan in tin.NguoiNhan.all %}
+                    {% if nhan.userprofile and nhan.userprofile.phong_ban %}
+                        {{ nhan.userprofile.phong_ban.TenPB }}{% if not forloop.last %}, {% endif %}
+                    {% else %}
+                        -{% if not forloop.last %}, {% endif %}
+                    {% endif %}
+                {% endfor %}
+                </p>
+
+
+                <p class="mb-1"><strong>Nội dung:</strong></p>
+                <div class="border rounded p-3 bg-light">{{ tin.NoiDung|linebreaks }}</div>
+
+                {% if tin.FileDinhKem %}
+                <p class="mt-3 mb-0"><strong>File đính kèm:</strong>
+                    <a href="{{ tin.FileDinhKem.url }}" target="_blank" class="text-decoration-none">
+                        {{ tin.FileDinhKem.name|slice:"-40:" }}
+                    </a>
+                </p>
+                {% endif %}
+
+                <p class="text-muted small mt-3 mb-0">
+                    Lúc lưu cuối: {{ tin.ThoiGianGui|date:"H:i d/m/Y" }}
+                </p>
+
+                <!-- Nút quay lại -->
+                <a href="{% url 'tin_nhap' %}" class="btn btn-secondary mt-3">← Quay lại</a>
+            </div>
+        </div>
+
+        <!-- FORM CHỈNH SỬA -->
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Chỉnh sửa tin nháp</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.as_p }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="luu_nhap" class="btn btn-primary">Lưu nháp</button>
+                        <button type="submit" name="gui_tin" class="btn btn-success">Gửi tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

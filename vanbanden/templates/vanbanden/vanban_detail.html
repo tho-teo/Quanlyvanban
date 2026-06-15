@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Thông tin văn bản đến{% endblock %}
+{% block content %}
+<div class="row">
+ <!-- SIDEBAR -->
+ <div class="col-md-2 sidebar">
+   <h6 class="text-uppercase mb-3">Văn bản đến</h6>
+   <a href="{% url 'vanban_cho_xuly' %}"class="fw-bold text-primary">Văn bản chờ xử lý</a>
+   <a href="{% url 'theodoi_xuly' %}">Theo dõi xử lý</a>
+   <a href="{% url 'tracuu_vanbanden' %}">Tra cứu văn bản đến</a>
+ </div>
+
+  <div class="flex-grow-1">
+<div class="container mt-4">
+        <h4 class="fw-bold mb-4 mt-2">Thông tin văn bản đến</h4>
+
+  <div class="row border p-3 rounded shadow-sm bg-light">
+    <div class="col-md-6">
+      <p><b>Trích yếu:</b> {{ vanban.TrichYeu }}</p>
+      <p><b>Số đến:</b> {{ vanban.SoDen }} – <b>Ngày đến:</b> {{ vanban.NgayDen|date:"d/m/Y" }}</p>
+      <p><b>Ngày ban hành:</b> {{ vanban.NgayBanHanh|date:"d/m/Y" }}</p>
+      <p><b>Cơ Quan Ban Hành:</b> {{ vanban.CoQuanBanHanh }}</p>
+      <p><b>Lĩnh vực văn bản:</b> {{ vanban.LoaiVanBan }}</p>
+    </div>
+
+    <div class="col-md-6">
+      <p><b>Số ký hiệu:</b> <span class="text-danger">{{ vanban.SoKyHieu }}</span></p>
+      <p><b>Cơ quan ban hành:</b> {{ vanban.CoQuanBanHanh }}</p>
+      <p><b>Lãnh đạo phê duyệt:</b> {{ vanban.NguoiDuyet }}</p>
+      <p><b>Người ký văn bản:</b> {{ vanban.NguoiKy }}</p>
+      <p><b>Cấp độ khẩn:</b> {{ vanban.DoKhan }} – <b>Cấp độ mật:</b> {{ vanban.DoMat }}</p>
+    </div>
+  </div>
+
+  <div class="mt-4 text-end">
+    {% if vanban.FileDinhKem %}
+      <a href="{{ vanban.FileDinhKem.url }}" target="_blank" class="btn btn-outline-primary me-2">
+        <i class="bi bi-eye"></i> Xem
+      </a>
+    {% endif %}
+    <a href="{% url 'phan_cong_van_ban' vanban.MaVanBanDen %}" class="btn btn-success">
+      <i class="bi bi-person-plus"></i> Phân công
+    </a>
+  </div>
+</div>
+{% endblock %}

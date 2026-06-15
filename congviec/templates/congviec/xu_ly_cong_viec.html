@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Xử lý công việc{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- SIDEBAR -->
+    <div class="col-md-2 sidebar">
+        <h6 class="text-uppercase mb-3">Công việc</h6>
+        <a href="{% url 'cong_viec_cho_xu_ly' %}">Công việc chờ xử lý</a>
+        <a href="{% url 'cong_viec_dang_xu_ly' %}">Công việc đang xử lý</a>
+        <a href="{% url 'cong_viec_da_hoan_thanh' %}">Công việc đã hoàn thành</a>
+    </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+    <!-- NỘI DUNG -->
+    <div class="col-md-10">
+        <div class="container mt-4">
+            <h4>Xử lý công việc: <em>{{ cv.TieuDe }}</em></h4>
+
+            <!-- FORM -->
+            <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm mt-3">
+                {% csrf_token %}
+
+                <!-- Thông tin văn bản -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-custom-header text-dark fw-bold">
+                        Thông tin Văn bản liên quan
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1"><b>Trích yếu:</b> <span class="fw-semibold">{{ vanban.TrichYeu }}</span></p>
+                        <p class="mb-1"><b>Số đến:</b> <span class="fw-semibold">{{ vanban.SoDen }}</span> –
+                        <b>Ngày đến:</b> <span class="fw-semibold">{{ vanban.NgayDen|date:"d/m/Y" }}</span></p>
+                        <p class="mb-1"><b>Số ký hiệu:</b> <span class="fw-semibold">{{ vanban.SoKyHieu }}</span></p>
+                        <p class="mb-1"><b>Cơ quan ban hành:</b> <span class="fw-semibold">{{ vanban.CoQuanBanHanh }}</span></p>
+                        {% if vanban.FileDinhKem %}
+                            <a href="{{ vanban.FileDinhKem.url }}" target="_blank" class="btn btn-outline-primary btn-sm mt-3">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Tải/Xem file đính kèm
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                    <div class="mb-3">
+                    <label class="form-label fw-bold">Mô tả:</label>  {{ form.MoTa }}</div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tệp đính kèm:</label>
+                        {{ form.FileDinhKem }}
+                    </div>
+
+                <!-- Nút hành động -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'cong_viec_cho_xu_ly' %}" class="btn btn-secondary">Quay lại</a>
+                    <button type="submit" class="btn btn-success">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

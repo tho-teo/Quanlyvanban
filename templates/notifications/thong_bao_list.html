@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Thông báo{% endblock %}
+
+{% block content %}
+<style>
+    .noti-read {
+        opacity: 0.6;
+        background-color: #f8f9fa;
+    }
+    .noti-unread {
+        font-weight: 600;
+        background-color: #ffffff;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+        Thông báo
+        {% if notifications|length > 0 %}
+            <a href="{% url 'mark_all_as_read' %}" class="btn btn-sm btn-primary">Đánh dấu tất cả đã đọc</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if notifications %}
+            <ul class="list-group">
+                {% for noti in notifications %}
+                    <li class="list-group-item {% if noti.is_read %}noti-read{% else %}noti-unread{% endif %}">
+                        <strong>{{ noti.title }}</strong> - {{ noti.message }}
+                        <br>
+                        <small>{{ noti.created_at|date:"d/m/Y H:i" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Không có thông báo nào.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

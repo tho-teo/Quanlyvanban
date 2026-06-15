@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if vbdi_edit %}Cập nhật dự thảo{% else %}Lập dự thảo{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex">
+  <div class="sidebar me-4">
+    <h6 class="text-uppercase mb-3">Văn bản đi</h6>
+    <a href="{% url 'lap_du_thao' %}" class="fw-bold text-primary">Lập dự thảo</a>
+    <a href="{% url 'van_ban_cho_ban_hanh' %}">Văn bản đi chờ ban hành</a>
+    <a href="{% url 'van_ban_di_ca_nhan' %}">Văn bản đi cá nhân</a>
+    <a href="{% url 'tra_cuu_van_ban_di' %}" >Tra cứu văn bản đi</a>
+  </div>
+
+  <div class="flex-grow-1">
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <h4 class="fw-bold mb-4 mt-2">
+        {% if vbdi_edit %}Cập nhật dự thảo: {{ vbdi_edit.so_van_ban }}{% else %}Dự thảo{% endif %}
+    </h4>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row g-3">
+
+        <div class="col-md-3">
+          <label class="form-label">Số văn bản *</label>
+          <input type="text" class="form-control" name="so_van_ban"
+                 value="{{ vbdi_edit.so_van_ban|default:'' }}"
+                 placeholder="Nhập số văn bản" required>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Đơn vị phát hành *</label>
+          <select class="form-select" name="co_quan_ban_hanh" required>
+            <option value="">--- Chọn đơn vị ---</option>
+            <option value="Ban Giám Hiệu" {% if vbdi_edit.co_quan_ban_hanh == 'Ban Giám Hiệu' %}selected{% endif %}>Ban Giám Hiệu</option>
+            <option value="Phòng Đào tạo" {% if vbdi_edit.co_quan_ban_hanh == 'Phòng Đào tạo' %}selected{% endif %}>Phòng Đào tạo</option>
+            <option value="Phòng Công tác Sinh viên" {% if vbdi_edit.co_quan_ban_hanh == 'Phòng Công tác Sinh viên' %}selected{% endif %}>Phòng Công tác Sinh viên</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Loại văn bản</label>
+          <select class="form-select" name="loai_van_ban">
+            <option value="">--- Chọn loại văn bản ---</option>
+            <option value="Nghị quyết (cá biệt)" {% if vbdi_edit.loai_van_ban == 'Nghị quyết (cá biệt)' %}selected{% endif %}>Nghị quyết</option>
+            <option value="Quyết định (cá biệt)" {% if vbdi_edit.loai_van_ban == 'Quyết định (cá biệt)' %}selected{% endif %}>Quyết định</option>
+            <option value="Chỉ thị" {% if vbdi_edit.loai_van_ban == 'Chỉ thị' %}selected{% endif %}>Chỉ thị</option>
+            <option value="Quy chế" {% if vbdi_edit.loai_van_ban == 'Quy chế' %}selected{% endif %}>Quy chế</option>
+            <option value="Quy định" {% if vbdi_edit.loai_van_ban == 'Quy định' %}selected{% endif %}>Quy định</option>
+            <option value="Thông cáo" {% if vbdi_edit.loai_van_ban == 'Thông cáo' %}selected{% endif %}>Thông cáo</option>
+            <option value="Thông báo" {% if vbdi_edit.loai_van_ban == 'Thông báo' %}selected{% endif %}>Thông báo</option>
+            <option value="Hướng dẫn" {% if vbdi_edit.loai_van_ban == 'Hướng dẫn' %}selected{% endif %}>Hướng dẫn</option>
+            <option value="Chương trình" {% if vbdi_edit.loai_van_ban == 'Chương trình' %}selected{% endif %}>Chương trình</option>
+            <option value="Kế hoạch" {% if vbdi_edit.loai_van_ban == 'Kế hoạch' %}selected{% endif %}>Kế hoạch</option>
+            <option value="Phương án" {% if vbdi_edit.loai_van_ban == 'Phương án' %}selected{% endif %}>Phương án</option>
+            <option value="Đề án" {% if vbdi_edit.loai_van_ban == 'Đề án' %}selected{% endif %}>Đề án</option>
+            <option value="Dự án" {% if vbdi_edit.loai_van_ban == 'Dự án' %}selected{% endif %}>Dự án</option>
+            <option value="Báo cáo" {% if vbdi_edit.loai_van_ban == 'Báo cáo' %}selected{% endif %}>Báo cáo</option>
+            <option value="Biên bản" {% if vbdi_edit.loai_van_ban == 'Biên bản' %}selected{% endif %}>Biên bản</option>
+            <option value="Tờ trình" {% if vbdi_edit.loai_van_ban == 'Tờ trình' %}selected{% endif %}>Tờ trình</option>
+            <option value="Hợp đồng" {% if vbdi_edit.loai_van_ban == 'Hợp đồng' %}selected{% endif %}>Hợp đồng</option>
+            <option value="Công văn" {% if vbdi_edit.loai_van_ban == 'Công văn' %}selected{% endif %}>Công văn</option>
+            <option value="Công điện" {% if vbdi_edit.loai_van_ban == 'Công điện' %}selected{% endif %}>Công điện</option>
+            <option value="Bản ghi nhớ" {% if vbdi_edit.loai_van_ban == 'Bản ghi nhớ' %}selected{% endif %}>Bản ghi nhớ</option>
+            <option value="Bản thỏa thuận" {% if vbdi_edit.loai_van_ban == 'Bản thỏa thuận' %}selected{% endif %}>Bản thỏa thuận</option>
+            <option value="Giấy ủy quyền" {% if vbdi_edit.loai_van_ban == 'Giấy ủy quyền' %}selected{% endif %}>Giấy ủy quyền</option>
+            <option value="Giấy mời" {% if vbdi_edit.loai_van_ban == 'Giấy mời' %}selected{% endif %}>Giấy mời</option>
+            <option value="Giấy giới thiệu" {% if vbdi_edit.loai_van_ban == 'Giấy giới thiệu' %}selected{% endif %}>Giấy giới thiệu</option>
+            <option value="Giấy nghỉ phép" {% if vbdi_edit.loai_van_ban == 'Giấy nghỉ phép' %}selected{% endif %}>Giấy nghỉ phép</option>
+            <option value="Phiếu gửi" {% if vbdi_edit.loai_van_ban == 'Phiếu gửi' %}selected{% endif %}>Phiếu gửi</option>
+            <option value="Phiếu chuyển" {% if vbdi_edit.loai_van_ban == 'Phiếu chuyển' %}selected{% endif %}>Phiếu chuyển</option>
+            <option value="Phiếu báo" {% if vbdi_edit.loai_van_ban == 'Phiếu báo' %}selected{% endif %}>Phiếu báo</option>
+            <option value="Thư công" {% if vbdi_edit.loai_van_ban == 'Thư công' %}selected{% endif %}>Thư công</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Loại nghiệp vụ</label>
+          <select class="form-select">
+            <option selected>Văn bản mới</option>
+            <option>Sửa đổi</option>
+            <option>Thay thế</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Độ khẩn</label>
+          <select class="form-select">
+            <option selected>Thường</option>
+            <option>Khẩn</option>
+            <option>Hỏa tốc</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Số trang của văn bản</label>
+          <input type="number" class="form-control" placeholder="Nhập số trang">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Hạn xử lý *</label>
+          <input type="date" class="form-control" name="han_xu_ly"
+                 value="{{ vbdi_edit.han_xu_ly|date:'Y-m-d'|default:'' }}" required>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label mt-3">Trích yếu *</label>
+          <input type="text" class="form-control" name="trich_yeu"
+                 value="{{ vbdi_edit.trich_yeu|default:'' }}"
+                 placeholder="Nhập trích yếu văn bản" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label mt-3">Đính kèm file dự thảo</label>
+          {% if vbdi_edit.file_du_thao %}
+            <div class="mb-1 text-success small">
+                <i class="bi bi-check-circle"></i> Đang có: {{ vbdi_edit.file_du_thao.name }}
+            </div>
+          {% endif %}
+          <input type="file" class="form-control" name="file_du_thao" accept=".pdf,.doc,.docx">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label mt-3">Đính kèm file liên quan</label>
+          {% if vbdi_edit.file_lien_quan %}
+            <div class="mb-1 text-success small">
+                <i class="bi bi-check-circle"></i> Đang có: {{ vbdi_edit.file_lien_quan.name }}
+            </div>
+          {% endif %}
+          <input type="file" class="form-control" name="file_lien_quan" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label mt-3">Người duyệt (Lãnh đạo) *</label>
+          <select class="form-select" name="nguoi_duyet" required>
+            <option value="">--- Chọn Lãnh đạo duyệt ---</option>
+            {% for user in nguoi_xu_ly_list %}
+              <option value="{{ user.id }}"
+                {% if vbdi_edit.nguoi_duyet == user %}selected{% endif %}>
+                {{ user.get_full_name|default:user.username }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label mt-3">Người nhận*</label>
+          <select class="form-select" name="nguoi_nhan" required>
+            <option value="">--- Chọn Phòng ban nhận ---</option>
+            {% for user in nguoi_xu_ly_list %}
+              <option value="{{ user.id }}"
+                {% if vbdi_edit.nguoi_nhan == user %}selected{% endif %}>
+                {{ user.get_full_name|default:user.username }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-12 text-center mt-4">
+          <button type="submit" class="btn btn-primary px-4 me-2">
+              {% if vbdi_edit %}Cập nhật & Trình lại{% else %}Trình{% endif %}
+          </button>
+          <a href="{% url 'van_ban_di_ca_nhan' %}" class="btn btn-secondary px-4">Hủy bỏ</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

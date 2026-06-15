@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Tra cứu văn bản đến{% endblock %}
+
+{% block content %}
+<div class="row">
+ <!-- SIDEBAR TRÁI -->
+ <div class="col-md-2 sidebar">
+   <h6 class="text-uppercase mb-3">Văn bản đến</h6>
+   <a href="{% url 'vanban_cho_xuly' %}">Văn bản chờ xử lý</a>
+   <a href="{% url 'theodoi_xuly' %}">Theo dõi xử lý</a>
+   <a href="{% url 'tracuu_vanbanden' %}"class="fw-bold text-primary">Tra cứu văn bản đến</a>
+ </div>
+
+ <!-- NỘI DUNG-->
+  <div class="flex-grow-1">
+    <h4 class="fw-bold mb-4 mt-2">Tra cứu văn bản đến</h4>
+       <form method="get" class="row g-3 mb-4 align-items-end">
+        <div class="col-md-3">
+          {{ form.q.label_tag }}
+          {{ form.q }}
+        </div>
+        <div class="col-md-3">
+          {{ form.tu_ngay.label_tag }}
+          {{ form.tu_ngay }}
+        </div>
+        <div class="col-md-3">
+          {{ form.den_ngay.label_tag }}
+          {{ form.den_ngay }}
+        </div>
+        <div class="col-md-3">
+          {{ form.trang_thai.label_tag }}
+          {{ form.trang_thai }}
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-50">Tìm kiếm</button>
+            <a href="{% url 'tracuu_vanbanden' %}" class="btn btn-secondary w-50">Clear</a>
+        </div>
+      </form>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-primary">
+          <tr>
+           <th>STT</th>
+           <th>Số/Ký hiệu</th>
+           <th>Trích yếu</th>
+           <th>Cơ quan ban hành</th>
+           <th>Ngày đến</th>
+           <th>File</th>
+         </tr>
+       </thead>
+   <tbody>
+     {% for vb in vanban_list %}
+     <tr>
+       <td>{{ forloop.counter }}</td>
+       <td>{{ vb.SoKyHieu }}</td>
+       <td>{{ vb.TrichYeu }}</td>
+       <td>{{ vb.CoQuanBanHanh }}</td>
+       <td>{{ vb.NgayDen|date:"d/m/Y" }}</td>
+        <td>
+          {% if vb.FileDinhKem %}
+            <a href="{{ vb.FileDinhKem.url }}" target="_blank" class="text-decoration-none">Xem file</a>
+          {% endif %}
+        </td>
+     </tr>
+     {% empty %}
+     <tr><td colspan="7" class="text-center text-muted">Không có văn bản nào.</td></tr>
+     {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

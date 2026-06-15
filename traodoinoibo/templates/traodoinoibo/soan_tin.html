@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Soạn tin{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- SIDEBAR TRÁI -->
+    <div class="col-md-2 sidebar">
+        <h6 class="text-uppercase mb-3">Trao đổi nội bộ</h6>
+
+        <a href="{% url 'soan_tin' %}" class="fw-bold text-primary">Soạn tin</a>
+        <a href="{% url 'tin_den' %}">Tin đến</a>
+        <a href="{% url 'tin_da_gui' %}">Tin đã gửi</a>
+        <a href="{% url 'tin_nhap' %}">Tin nháp</a>
+        <a href="{% url 'tin_da_xoa' %}">Tin đã xóa</a>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <div class="col-md-10 main-content">
+      <h5 class="fw-bold text-dark mb-4">Soạn tin </h5>
+
+      <!-- HIỂN THỊ THÔNG BÁO -->
+      {% if messages %}
+      <div class="mt-3">
+        {% for message in messages %}
+        <div class="alert
+                  {% if message.tags == 'success' %}alert-success
+                  {% elif message.tags == 'error' %}alert-danger
+                  {% else %}alert-info{% endif %}
+                  alert-dismissible fade show">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+<!--        &lt;!&ndash; ĐƠN VỊ TRỰC THUỘC &ndash;&gt;-->
+<!--<div class="mb-3">-->
+<!--  <label class="form-label fw-semibold">Đơn vị trực thuộc</label>-->
+<!--  <select name="DonViTrucThuoc" class="form-select" onchange="this.form.submit()">-->
+<!--      <option value="">&#45;&#45; Chọn phòng ban &#45;&#45;</option>-->
+<!--      {% for pb in phongbans %}-->
+<!--          <option value="{{ pb.id }}" {% if pb.id|stringformat:"s" == don_vi_id %}selected{% endif %}>{{ pb.TenPB }}</option>-->
+<!--      {% endfor %}-->
+<!--  </select>-->
+<!--  {% if form.DonViTrucThuoc.errors %}-->
+<!--    <small class="text-danger">{{ form.DonViTrucThuoc.errors.0 }}</small>-->
+<!--  {% endif %}-->
+<!--</div>-->
+
+<!-- NGƯỜI NHẬN -->
+<div class="mb-3">
+    <label class="form-label fw-semibold">Người nhận</label>
+    <div class="border rounded p-2" style="max-height: 300px; overflow-y:auto;">
+        {% if don_vi_canbos %}
+            {% for pb, canbos in don_vi_canbos.items %}
+                <div class="mb-2">
+                    <strong>{{ pb.TenPB }}</strong>
+                    <div class="ps-3">
+                        {% for user in canbos %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="NguoiNhanCheckbox"
+                                       value="{{ user.id }}"
+                                       id="cb{{ user.id }}"
+                                       {% if user.id|stringformat:"s" in nguoi_nhan_ids %}checked{% endif %}>
+                                <label class="form-check-label" for="cb{{ user.id }}">
+                                    {{ user.get_full_name|default:user.username }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted small">Chưa có cán bộ nào để hiển thị.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+
+        <!-- TIÊU ĐỀ -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Tiêu đề</label>
+          {{ form.TieuDe }}
+          {% if form.TieuDe.errors %}
+            <small class="text-danger">{{ form.TieuDe.errors.0 }}</small>
+          {% endif %}
+        </div>
+
+        <!-- NỘI DUNG -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Nội dung</label>
+          {{ form.NoiDung }}
+          {% if form.NoiDung.errors %}
+            <small class="text-danger">{{ form.NoiDung.errors.0 }}</small>
+          {% endif %}
+        </div>
+
+        <!-- FILE ĐÍNH KÈM -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">File đính kèm</label>
+
+            {{ form.FileDinhKem }}
+
+            {% if form.FileDinhKem.errors %}
+              <small class="text-danger">{{ form.FileDinhKem.errors.0 }}</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- NÚT HÀNH ĐỘNG -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+
+    <button type="submit"
+            name="btn_save_draft"
+            class="btn btn-outline-primary">
+        <i class="bi bi-save"></i> Lưu bản nháp
+    </button>
+
+    <button type="submit"
+            name="btn_send"
+            class="btn btn-primary">
+        <i class="bi bi-send"></i> Gửi
+    </button>
+
+</div>
+
+
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const donVi = document.querySelector("select[name='DonViTrucThuoc']");
+    if (donVi) {
+        donVi.addEventListener("change", function () {
+            this.form.submit();
+        });
+    }
+});
+</script>
+
+{% endblock %}

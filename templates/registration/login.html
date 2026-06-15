@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", sans-serif;
+    }
+    .login-wrapper {
+        display: flex;
+        justify-content:  flex-start;
+        align-items: center;
+        height: calc(80vh - 80px);
+        gap: 40px; /* khoảng cách giữa hình và form */
+    }
+
+    .login-image img {
+        width: 400px; /* tăng kích thước hình */
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .login-box {
+        background-color: #fff;
+        padding: 40px 50px;
+        border-radius: 10px;
+        width: 550px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .login-box h2 {
+        color: #1a237e;
+        margin-bottom: 25px;
+    }
+
+    .login-box input[type="text"],
+    .login-box input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+
+    .login-box input:focus {
+        outline: none;
+        border-color: #3a6ee8;
+        box-shadow: 0 0 3px rgba(58, 110, 232, 0.5);
+    }
+
+    .login-box .btn-login {
+        width: 100%;
+        background-color: #3a6ee8;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 12px;
+        margin-top: 10px;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .login-box .btn-login:hover {
+        background-color: #2f58c2;
+    }
+
+    .login-box .password-reset-link {
+        margin-top: 10px;
+        font-size: 13px;
+    }
+
+    .login-box .errornote {
+        color: red;
+        margin-bottom: 10px;
+    }
+
+    .footer {
+        margin-top: 25px;
+        font-size: 13px;
+        color: #666;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-image">
+        <img src="{% static 'images/50.jpg' %}" alt="Logo">
+
+    </div>
+
+    <div class="login-box">
+        <h2>HỆ THỐNG QUẢN LÝ VĂN BẢN ĐIỀU HÀNH</h2>
+
+{% if user.is_authenticated %}
+<p class="errornote">
+{% blocktranslate trimmed %}
+    You are authenticated as {{ username }}, but are not authorized to
+    access this page. Would you like to login to a different account?
+{% endblocktranslate %}
+</p>
+{% endif %}
+
+<form action="{% url 'accounts:login' %}" method="post" id="login-form">{% csrf_token %}
+  <div class="form-row">
+    {{ form.username.errors }}
+    {{ form.username.label_tag }} {{ form.username }}
+  </div>
+  <div class="form-row">
+    {{ form.password.errors }}
+    {{ form.password.label_tag }} {{ form.password }}
+    <input type="hidden" name="next" value="{{ next }}">
+  </div>
+  {% url 'accounts:password_reset' as password_reset_url %}
+  {% if password_reset_url %}
+  <div class="password-reset-link">
+    <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+  </div>
+  {% endif %}
+  <div class="submit-row">
+    <input type="submit" value="{% translate 'Log in' %}">
+  </div>
+</form>
+
+</div>
+{% endblock %}
+

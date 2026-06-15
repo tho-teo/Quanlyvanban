@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Tin đến{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-md-2 sidebar">
+        <h6 class="text-uppercase mb-3">Trao đổi nội bộ</h6>
+
+        <a href="{% url 'soan_tin' %}">Soạn tin</a>
+        <a href="{% url 'tin_den' %}" class="fw-bold text-primary">Tin đến</a>
+        <a href="{% url 'tin_da_gui' %}">Tin đã gửi</a>
+        <a href="{% url 'tin_nhap' %}">Tin nháp</a>
+        <a href="{% url 'tin_da_xoa' %}">Tin đã xóa</a>
+    </div>
+
+    <div class="flex-grow-1">
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+        <h5 class="fw-bold text-dark mb-4">Tin đến</h5>
+
+        <!-- FORM LỌC -->
+        <form method="get" class="row g-3 mb-4 align-items-end">
+
+            <div class="col-md-3">
+                {{ form.TuNgay.label_tag }}
+                {{ form.TuNgay }}
+            </div>
+
+            <div class="col-md-3">
+                {{ form.DenNgay.label_tag }}
+                {{ form.DenNgay }}
+            </div>
+
+            <div class="col-md-3">
+                {{ form.TieuDe.label_tag }}
+                {{ form.TieuDe }}
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-50">Tìm kiếm</button>
+                <a href="{% url 'tin_den' %}" class="btn btn-secondary w-50">Clear</a>
+            </div>
+
+        </form>
+
+        <!-- DANH SÁCH TIN -->
+        <div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center mb-0">
+                        <thead style="background-color: #e6f0ff;">
+                        <tr>
+                            <th>Người gửi</th>
+                            <th>Đơn vị trực thuộc</th>
+                            <th>Tiêu đề</th>
+                            <th>Thời gian</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% if danh_sach_tin %}
+                            {% for tin in danh_sach_tin %}
+                            <tr>
+                                <!-- NGƯỜI GỬI -->
+                                <td class="text-start">
+                                    {% if tin.NguoiGui.get_full_name %}
+                                        {{ tin.NguoiGui.get_full_name }}
+                                    {% else %}
+                                        {{ tin.NguoiGui.username }}
+                                    {% endif %}
+                                </td>
+
+                                <!-- ĐƠN VỊ -->
+                                <td>
+                                    {% if tin.NguoiGui.userprofile.phong_ban %}
+                                        {{ tin.NguoiGui.userprofile.phong_ban.TenPB }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+
+
+                                <!-- TIÊU ĐỀ -->
+                                <td class="text-start">
+                                    <a href="{% url 'tin_detail_tin_den' tin.MaTin %}"
+                                       class="text-primary text-decoration-none">
+                                        {{ tin.TieuDe }}
+                                    </a>
+
+                                    {% if tin.FileDinhKem %}
+                                    <div class="small text-muted mt-1">
+                                        {{ tin.FileDinhKem.name|slice:"-40:" }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- THỜI GIAN -->
+                                <td>
+                                    {% if tin.ThoiGianGui %}
+                                        {{ tin.ThoiGianGui|date:"H:i d/m/Y" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                <!-- XÓA -->
+                                <td>
+                                    <a href="{% url 'xoa_tin_den' tin.MaTin %}"
+                                       class="btn btn-danger btn-sm">
+                                        Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-muted">
+                                    Không có tin đến
+                                </td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

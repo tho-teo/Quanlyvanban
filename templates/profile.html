@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Thông tin người dùng {% endblock %}
+
+{% block content %}
+
+<!-- ẢNH ĐẠI DIỆN-->
+<div class="avatar-floating">
+    {% if profile and profile.anh_dai_dien %}
+        <img src="{{ profile.anh_dai_dien.url }}" alt="Ảnh đại diện" style="width: 100%; height: 100%; object-fit: cover;">
+    {% else %}
+        <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #f8f9fa; color: #6c757d; font-size: 0.9em; text-align: center;">
+            <i class="bi bi-person-fill" style="font-size: 3em;"></i>
+            <small>Chưa có ảnh</small>
+        </div>
+    {% endif %}
+</div>
+    <style>
+    .avatar-floating {
+        position: absolute;
+        top: 120px; /* chỉnh theo vị trí mong muốn */
+        left: 40px; /* đẩy sát sidebar */
+        width: 200px;
+        height: 200px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    }
+    </style>
+
+<div class="container" style="max-width: 1000px; margin: 0 auto;">
+    <h3 class="mb-4 text-center"></i> Thông tin cá nhân: <em> {{ user.first_name }} {{ user.last_name }}</em></h3>
+
+    <div class="card shadow-sm mb-4 p-3">
+        <p><strong>Tên tài khoản:</strong> {{ user.username }}</p>
+        <p><strong>Họ tên:</strong>  {{ user.first_name }} {{ user.last_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+ <p><strong>Phòng ban:</strong> {{ user_profile.phong_ban.TenPB }}</p>
+
+
+    </div>
+
+    <h4 class="mb-3 text-center">Thống kê công việc</h4>
+    <div class="row text-center">
+        <div class="col-md-4 mb-3">
+            <div class="card p-3 h-100 border-primary shadow-sm">
+                <h5 class="text-primary">{{ cv_cho_xu_ly }}</h5>
+                <p class="mb-0">Công việc chờ xử lý</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card p-3 h-100 border-warning shadow-sm">
+                <h5 class="text-warning">{{ cv_dang_xu_ly }}</h5>
+                <p class="mb-0">Công việc đang xử lý</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card p-3 h-100 border-success shadow-sm">
+                <h5 class="text-success">{{ cv_hoan_thanh }}</h5>
+                <p class="mb-0">Công việc đã hoàn thành</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

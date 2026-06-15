@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}{% if instance %}Chỉnh sửa phân công{% else %}Phân công xử lý văn bản{% endif %}{% endblock %}
+{% block content %}
+
+<div class="row">
+  <!-- SIDEBAR -->
+  <div class="col-md-2 sidebar">
+    <h6 class="text-uppercase mb-3">Văn bản đến</h6>
+    <a href="{% url 'vanban_cho_xuly' %}" class="fw-bold text-primary">Văn bản chờ xử lý</a>
+    <a href="{% url 'theodoi_xuly' %}">Theo dõi xử lý</a>
+    <a href="{% url 'tracuu_vanbanden' %}">Tra cứu văn bản đến</a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="flex-grow-1">
+    <div class="container mt-4">
+
+      <h4 class="fw-bold mb-4 mt-2">
+        {% if instance %}Chỉnh sửa phân công{% else %}Phân công xử lý{% endif %}
+      </h4>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- THÔNG TIN VĂN BẢN -->
+      <div class="card p-3 mb-3">
+        <label class="form-label mb-1"><b>Thông tin Văn bản</b></label>
+        <table class="table table-sm mb-0">
+          <tbody>
+            <tr>
+              <td><b>Số ký hiệu:</b></td>
+              <td>{{ vanban.SoKyHieu }}</td>
+            </tr>
+            <tr>
+              <td><b>Trích yếu:</b></td>
+              <td colspan="3">{{ vanban.TrichYeu }}</td>
+            </tr>
+            <tr>
+              <td><b>Cơ quan ban hành:</b></td>
+              <td colspan="3">{{ vanban.CoQuanBanHanh }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FORM -->
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-3">
+
+          <!-- DANH SÁCH CÁN BỘ -->
+          <div class="col-md-6">
+            <div class="card p-3">
+              <label class="form-label mt-1"><b>Cán bộ xử lý</b></label>
+              <div class="border rounded p-2" style="max-height: 300px; overflow-y:auto;">
+
+                {% for pb, canbos in phongban_canbos.items %}
+                  <div class="mb-2">
+                    <b>{{ pb.TenPB }}</b>
+
+                    {% if canbos %}
+{% for cb in canbos %}
+  {% with nx=nx_dict.cb.id %}
+    <div class="d-flex align-items-center gap-2 ms-3 mb-1">
+      <!-- CHECKBOX -->
+      <input class="form-check-input"
+             type="checkbox"
+             name="canbos"
+             value="{{ cb.id }}"
+             id="cb{{ cb.id }}"
+             {% if nx %}checked{% endif %}>
+      <label class="form-check-label mb-0" for="cb{{ cb.id }}">
+        {{ cb.get_full_name|default:cb.username }}
+      </label>
+
+      <!-- SELECT VAI TRÒ -->
+      <select name="vaitro_{{ cb.id }}" class="form-select form-select-sm w-auto">
+        <option value="Xử lý chính" {% if nx and nx.VaiTro == "Xử lý chính" %}selected{% endif %}>Xử lý chính</option>
+        <option value="Phối hợp xử lý" {% if nx and nx.VaiTro == "Phối hợp xử lý" %}selected{% endif %}>Phối hợp xử lý</option>
+      </select>
+    </div>
+  {% endwith %}
+{% endfor %}
+
+                    {% endif %}
+                  </div>
+                {% endfor %}
+
+              </div>
+            </div>
+          </div>
+
+          <!-- NỘI DUNG - HẠN -->
+          <div class="col-md-6">
+            <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+              <div>
+                <label class="form-label mt-3"><b>Hạn xử lý *</b></label>
+                <input type="date"
+                       class="form-control"
+                       name="han_xu_ly"
+                       required
+                       value="{% if instance %}{{ instance.HanXuLy|date:'Y-m-d' }}{% endif %}">
+
+                <label class="form-label mb-1 mt-3"><b>Nội dung yêu cầu</b></label>
+                <textarea class="form-control" name="noi_dung" rows="6" required>
+{% if instance %}{{ instance.TieuDe }}{% endif %}
+                </textarea>
+              </div>
+
+              <!-- BUTTON -->
+              <div class="text-end mt-3">
+                <a href="{% url 'theodoi_xuly' %}" class="btn btn-secondary btn-sm">Quay lại</a>
+                <button type="submit" class="btn btn-success btn-sm">
+                  {% if instance %}Cập nhật phân công{% else %}Xác nhận phân công{% endif %}
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

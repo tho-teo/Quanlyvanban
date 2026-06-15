@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Văn bản đi cá nhân{% endblock %}
+{% block content %}
+
+<div class="d-flex">
+  <div class="sidebar me-4">
+    <h6 class="text-uppercase mb-3">Văn bản đi</h6>
+    <a href="{% url 'lap_du_thao' %}">Lập dự thảo</a>
+    <a href="{% url 'van_ban_cho_ban_hanh' %}">Văn bản đi chờ ban hành</a>
+    <a href="{% url 'van_ban_di_ca_nhan' %}" class="fw-bold text-primary">Văn bản đi cá nhân</a>
+    <a href="{% url 'tra_cuu_van_ban_di' %}" >Tra cứu văn bản đi</a>
+  </div>
+
+  <div class="flex-grow-1">
+    <h4 class="fw-bold mb-4 mt-2">Văn bản đi cá nhân</h4>
+
+    <form method="GET" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Từ khóa tìm kiếm:</label>
+          <input type="text" class="form-control" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Nhập trích yếu, số ký hiệu">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Từ ngày:</label>
+          <input type="date" class="form-control" name="tu_ngay" value="{{ request.GET.tu_ngay|default:'' }}">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Đến ngày:</label>
+          <input type="date" class="form-control" name="den_ngay" value="{{ request.GET.den_ngay|default:'' }}">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Trạng thái:</label>
+            <select class="form-select" name="trang_thai_loc">
+                <option value="tat_ca" {% if request.GET.trang_thai_loc == 'tat_ca' %}selected{% endif %}>Tất cả</option>
+                <option value="Đã ban hành" {% if request.GET.trang_thai_loc == 'Đã ban hành' %}selected{% endif %}>Đã ban hành</option>
+                <option value="Chờ duyệt" {% if request.GET.trang_thai_loc == 'Chờ duyệt' %}selected{% endif %}>Chờ duyệt</option>
+                <option value="Bị từ chối" {% if request.GET.trang_thai_loc == 'Bị từ chối' %}selected{% endif %}>Yêu cầu sửa</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-50 me-2">Tìm kiếm</button>
+          <a href="{% url 'van_ban_di_ca_nhan' %}" class="btn btn-secondary w-50">Clear</a>
+        </div>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-primary">
+          <tr>
+            <th>STT</th>
+            <th>Ngày tạo</th>
+            <th>Số ký hiệu</th>
+            <th>Người duyệt</th>
+            <th>Trích yếu</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vb in vb_list %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ vb.ngay_tao|date:"d/m/Y" }}</td>
+            <td>{{ vb.so_van_ban }}</td>
+            <td class="text-primary">{{ vb.nguoi_duyet.username|default:"Chưa chọn" }}</td>
+            <td class="text-start">{{ vb.trich_yeu|default:"(Chưa nhập)" }}</td>
+
+            <td class="fw-bold">
+                {% if vb.trang_thai == 'Đã ban hành' %}
+                    <span class="text-primary text-decoration-none fw-bold">Đã ban hành</span>
+                {% elif vb.trang_thai == 'Chờ duyệt' %}
+                    <span class="text-primary text-decoration-none fw-bold">Chờ duyệt</span>
+                {% elif vb.trang_thai == 'Bị từ chối' %}
+                    <span class="text-primary text-decoration-none fw-bold">Yêu cầu sửa</span>
+                {% else %}
+                    <span class="text-primary text-decoration-none fw-bold">{{ vb.trang_thai }}</span>
+                {% endif %}
+            </td>
+
+            <td>
+              {% if vb.trang_thai == 'Bị từ chối' or vb.trang_thai == 'Mới' %}
+                <a href="{% url 'sua_van_ban_di' vb.id %}" class="text-primary text-decoration-none">
+                    Sửa lại
+                </a>
+              {% else %}
+                 {% if vb.file_du_thao %}
+                    <a href="{{ vb.file_du_thao.url }}" target="_blank" class="text-primary text-decoration-none">Xem file</a>
+                 {% else %}
+                    -
+                 {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-muted">Không có dữ liệu.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

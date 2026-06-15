@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết tin{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-md-2 sidebar">
+        <h6 class="text-uppercase mb-3">Trao đổi nội bộ</h6>
+
+        <a href="{% url 'soan_tin' %}">Soạn tin</a>
+        <a href="{% url 'tin_den' %}">Tin đến</a>
+        <a href="{% url 'tin_da_gui' %}">Tin đã gửi</a>
+        <a href="{% url 'tin_nhap' %}">Tin nháp</a>
+        <a href="{% url 'tin_da_xoa' %}" class="fw-bold text-primary">Tin đã xóa</a>
+    </div>
+<div class="container mt-4">
+  <h4 class="fw-bold text-dark">{{ tin.TieuDe }}</h4>
+  <p><strong>Người gửi:</strong> {{ tin.NguoiGui.get_full_name|default:tin.NguoiGui.username }}</p>
+  <p><strong>Người nhận:</strong>
+    {% for u in tin.NguoiNhan.all %}
+        {{ u.get_full_name|default:u.username }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </p>
+
+  <p><strong>Đơn vị:</strong>
+    {% if tin.NguoiGui.userprofile.phong_ban %}
+        {{ tin.NguoiGui.userprofile.phong_ban.TenPB }}
+    {% else %}
+        -
+    {% endif %}
+</p>
+  <p><strong>Nội dung:</strong></p>
+  <div class="border rounded p-3 bg-light">{{ tin.NoiDung|linebreaks }}</div>
+
+  {% if tin.FileDinhKem %}
+  <p class="mt-3"><strong>File đính kèm:</strong>
+    <a href="{{ tin.FileDinhKem.url }}" target="_blank">{{ tin.FileDinhKem.name|slice:"-40:" }}</a>
+  </p>
+  {% endif %}
+
+  <p class="text-muted small mt-3">Gửi lúc {{ tin.ThoiGianGui|date:"H:i d/m/Y" }}</p>
+  <a href="{% url 'tin_da_xoa' %}" class="btn btn-outline-primary mt-2">← Quay lại</a>
+</div>
+</div>
+{% endblock %}
